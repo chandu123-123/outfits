@@ -9,21 +9,21 @@ const Page = () => {
       <header className="bg-white shadow-md">
         <nav className="container mx-auto px-6 py-3">
           <div className="flex justify-between items-center">
-            <div className="text-xl font-bold text-gray-800">Collection Store</div>
+            <div className="text-xl   text-gray-800 font-poppins">Ready Outfits</div>
            
           </div>
         </nav>
       </header>
 
       <main className="container mx-auto px-6 py-8 center">
-        <h1 className="text-4xl font-bold text-center mb-8">Transform Your Festival Style</h1>
+        <h1 className="text-4xl font-semibold text-center mb-8 font-poppins">Transform Your Festival Style</h1>
         <div className='flex justify-center p-5 pb-10'>
 
         <Image src={"/genz.webp"} height={200} width={300} className='rounded-md '></Image>
         </div>
         <div className="flex justify-center space-x-4">
           <Link href="/outfits" className="inline-block">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 font-poppins">
              Show outfits
             </button>
           </Link>
@@ -33,7 +33,7 @@ const Page = () => {
 
       <footer className="bg-gray-800 text-white mt-12">
         <div className="container mx-auto px-6 py-4">
-          <p className="text-center">&copy; 2024 Fashion Store. All rights reserved.</p>
+          <p className="text-center">&copy; 2024 Ready Outfits. All rights reserved.</p>
         </div>
       </footer>
     </div>
