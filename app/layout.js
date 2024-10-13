@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import { Poppins } from "next/font/google";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 const geistSans = localFont({
@@ -31,6 +32,7 @@ Elevate your style and make a bold fashion statement with our ready-to-wear coll
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <GoogleAnalytics />
       <body
          className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}  antialiased`}
       >
