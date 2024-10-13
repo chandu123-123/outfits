@@ -1,8 +1,9 @@
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import { Poppins } from "next/font/google";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+
 import "./globals.css";
+import GoogleAnalytics from "./components/GoogleAnalytics";
 const inter = Inter({ subsets: ["latin"] });
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
