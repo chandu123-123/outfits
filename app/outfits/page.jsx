@@ -38,6 +38,7 @@ const Outfit = () => {
           if (id) {
             const matchingItem = items.find(item => item._id === id);
             if (matchingItem) {
+              items = shuffle(items);
               items = items.filter(item => item._id !== id);
               items.unshift(matchingItem);
             }
