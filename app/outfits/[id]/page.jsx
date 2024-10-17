@@ -1,28 +1,29 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from 'react';
 import { shuffle } from 'lodash';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Share2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react'; 
 import Modal from '../components/Modal';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 
 const swipeConfidenceThreshold = 10000;
 const swipePower = (offset, velocity) => {
   return Math.abs(offset) * velocity;
 };
 
-export default function Outfit() {
+export default function Men() {
+  const searchParams = useSearchParams(); // Get the search parameters
+  const id = searchParams.get('_id'); // Extract the _id parameter
+
   const [fetchedItems, setFetchedItems] = useState([]);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItemLinks, setSelectedItemLinks] = useState([]);
-  const [isNextImageLoading, setIsNextImageLoading] = useState(false);
-
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const [selectedItemId, setSelectedItemId] = useState(null); 
+  const [isNextImageLoading, setIsNextImageLoading] = useState(false); 
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -31,24 +32,14 @@ export default function Outfit() {
         const response = await fetch(`/api/getItems`);
         if (response.ok) {
           const data = await response.json();
-          let items = data.fetchedItems;
+          setFetchedItems(data.fetchedItems);
 
-          if (id) {
-            // Find the item with the matching ID
-            const matchingItem = items.find(item => item._id === id);
-            if (matchingItem) {
-              // Remove the matching item from the array
-              items = items.filter(item => item._id !== id);
-              // Add the matching item to the front of the array
-              items.unshift(matchingItem);
-            }
-          } else {
-            // If no ID, shuffle the items
-            items = shuffle(items);
-          }
-
-          setFetchedItems(items);
-          setDisplayedItems(items);
+          // If there is an _id in the query, display that item first
+          const initialItems = id 
+            ? [data.fetchedItems.find(item => item._id === id), ...shuffle(data.fetchedItems.filter(item => item._id !== id))]
+            : shuffle(data.fetchedItems);
+          
+          setDisplayedItems(initialItems);
         } else {
           console.error('Failed to fetch items');
         }
@@ -60,7 +51,7 @@ export default function Outfit() {
     };
 
     fetchItems();
-  }, [id]);
+  }, [id]); // Add id to the dependency array
 
   const preloadNextImage = (url) => {
     const img = new window.Image();
@@ -69,7 +60,7 @@ export default function Outfit() {
 
   const removeTopCard = () => {
     setIsAnimating(true);
-    setIsNextImageLoading(true);
+    setIsNextImageLoading(true); 
     setTimeout(() => {
       setDisplayedItems((prev) => {
         const newItems = prev.slice(1);
@@ -83,30 +74,23 @@ export default function Outfit() {
         return newItems;
       });
       setIsAnimating(false);
-      setIsNextImageLoading(false);
+      setIsNextImageLoading(false); 
     }, 300);
   };
 
-  const handleImageClick = (links) => {
-    setSelectedItemLinks(links);
+  const handleImageClick = (item) => {
+    setSelectedItemLinks(item.links);
+    setSelectedItemId(item._id); 
     setIsModalOpen(true);
   };
 
-  const generateShareLink = (item) => {
-    return `${window.location.origin}/outfits?id=${item}`;
-  };
-
-  const copyToClipboard = (link) => {
-    navigator.clipboard.writeText(link).then(() => {
-      alert('Link copied to clipboard!');
+  const handleShareClick = () => {
+    const outfitUrl = `http://localhost:3000/outfit/${selectedItemId}`; 
+    navigator.clipboard.writeText(outfitUrl).then(() => {
+      alert('Outfit URL copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
     });
-  };
-
-  const handleShare = (e, item) => {
-    e.stopPropagation();
-    console.log(item._id)
-    const shareLink = generateShareLink(item._id);
-    copyToClipboard(shareLink);
   };
 
   return (
@@ -124,7 +108,7 @@ export default function Outfit() {
               {displayedItems.map((item, index) =>
                 index === 0 && (
                   <motion.div
-                    key={`${item._id}-${index}`}
+                    key={item._id} 
                     className="absolute w-full h-full"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -141,7 +125,7 @@ export default function Outfit() {
                         }
                       }
                     }}
-                    
+                    onClick={() => handleImageClick(item)} 
                   >
                     {isNextImageLoading && (
                       <div className="absolute inset-0 flex justify-center items-center">
@@ -155,19 +139,13 @@ export default function Outfit() {
                       alt={`Item ${index + 1}`}
                       draggable="false"
                     />
-                    <button
-                      className="absolute top-2 right-2 p-2 bg-white bg-opacity-75 rounded-full"
-                      onClick={(e) => handleShare(e, item)}
-                    >
-                      <Share2 className="h-6 w-6 text-gray-800" />
-                    </button>
                     <motion.div
                       className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2"
                       initial={{ y: 50, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.2, duration: 0.3 }}
                     >
-                      <p className="font-semibold" onClick={() => handleImageClick(item.links)}>View Links</p>
+                      <p className="font-semibold">View Links</p>
                     </motion.div>
                   </motion.div>
                 )
@@ -186,6 +164,7 @@ export default function Outfit() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         itemLinks={selectedItemLinks}
+        onShareClick={handleShareClick} 
       />
     </div>
   );
