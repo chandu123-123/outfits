@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { shuffle } from 'lodash';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,12 +7,14 @@ import { Loader2, Share2 } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useSearchParams } from 'next/navigation';
 
+// Define swipe constants
 const swipeConfidenceThreshold = 10000;
 const swipePower = (offset, velocity) => {
   return Math.abs(offset) * velocity;
 };
 
-export default function Outfit() {
+// Main component
+const Outfit = () => {
   const [fetchedItems, setFetchedItems] = useState([]);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -34,16 +36,12 @@ export default function Outfit() {
           let items = data.fetchedItems;
 
           if (id) {
-            // Find the item with the matching ID
             const matchingItem = items.find(item => item._id === id);
             if (matchingItem) {
-              // Remove the matching item from the array
               items = items.filter(item => item._id !== id);
-              // Add the matching item to the front of the array
               items.unshift(matchingItem);
             }
           } else {
-            // If no ID, shuffle the items
             items = shuffle(items);
           }
 
@@ -62,11 +60,13 @@ export default function Outfit() {
     fetchItems();
   }, [id]);
 
+  // Function to preload next image
   const preloadNextImage = (url) => {
     const img = new window.Image();
     img.src = url;
   };
 
+  // Function to remove top card
   const removeTopCard = () => {
     setIsAnimating(true);
     setIsNextImageLoading(true);
@@ -87,24 +87,27 @@ export default function Outfit() {
     }, 300);
   };
 
+  // Function to handle image click
   const handleImageClick = (links) => {
     setSelectedItemLinks(links);
     setIsModalOpen(true);
   };
 
+  // Function to generate share link
   const generateShareLink = (item) => {
     return `${window.location.origin}/outfits?id=${item}`;
   };
 
+  // Function to copy link to clipboard
   const copyToClipboard = (link) => {
     navigator.clipboard.writeText(link).then(() => {
       alert('Link copied to clipboard!');
     });
   };
 
+  // Function to handle share action
   const handleShare = (e, item) => {
     e.stopPropagation();
-    console.log(item._id)
     const shareLink = generateShareLink(item._id);
     copyToClipboard(shareLink);
   };
@@ -141,7 +144,6 @@ export default function Outfit() {
                         }
                       }
                     }}
-                    
                   >
                     {isNextImageLoading && (
                       <div className="absolute inset-0 flex justify-center items-center">
@@ -189,4 +191,13 @@ export default function Outfit() {
       />
     </div>
   );
-}
+};
+
+// Wrap your component in Suspense
+const OutfitWithSuspense = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Outfit />
+  </Suspense>
+);
+
+export default OutfitWithSuspense;
