@@ -7,10 +7,11 @@ const Page = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow-md">
-        <nav className="container mx-auto px-6 py-3">
-          <div className="flex justify-between items-center">
-            <div className="text-xl   text-gray-800 font-poppins">Ready Outfits</div>
+        <nav className="container mx-auto px-6 py-3 gap-9">
+          <div className="flex justify-between items-center ">
+            <div className="text-xl  text-gray-800 font-poppins"><Link href={"/"}>Ready Outfits</Link></div>
            
+          <Link href={"/savedOutfits"}>Saved</Link>
           </div>
         </nav>
       </header>

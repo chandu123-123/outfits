@@ -3,10 +3,12 @@ import React, { useState, useEffect, Suspense } from "react";
 import { shuffle } from "lodash";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Share2 } from "lucide-react";
+import { Loader2, Share2, Save } from "lucide-react";
 import Modal from "../components/Modal";
 import { useSearchParams } from "next/navigation";
-
+import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 // Define swipe constants
 const swipeConfidenceThreshold = 10000;
 const swipePower = (offset, velocity) => {
@@ -98,10 +100,43 @@ const Outfit = () => {
   // Function to copy link to clipboard
   const copyToClipboard = (link) => {
     navigator.clipboard.writeText(link).then(() => {
-      alert("Link copied to clipboard!");
+      toast.success("Link copied to clipboard!", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored", // You can use "light", "dark", or "colored"
+      });
     });
   };
+  const saveOutfit = (item) => {
+    const savedOutfits = JSON.parse(localStorage.getItem("savedOutfits")) || [];
 
+  // Check if the item already exists in the array (using item.id for uniqueness)
+  const itemExists = savedOutfits.some((savedItem) => savedItem._id === item._id);
+ console.log(savedOutfits)
+  // If the item doesn't exist, add it to the array and update localStorage
+  if (!itemExists) {
+    const updatedOutfits = [...savedOutfits, item];
+    localStorage.setItem("savedOutfits", JSON.stringify(updatedOutfits));
+    console.log("Item saved successfully!");
+  } else {
+    console.log("Item already exists in saved outfits.");
+  }
+  toast.success("Outfit Saved", {
+    position: "top-right",
+    autoClose: 1000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "colored", // You can use "light", "dark", or "colored"
+  });
+  };
   // Function to handle share action
   const handleShare = (e, item) => {
     e.stopPropagation();
@@ -110,8 +145,17 @@ const Outfit = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-semibold mb-4 font-poppins">Ready Outfits</h1>
+    <div className="">
+       <ToastContainer />
+        <header className="bg-white shadow-md">
+        <nav className="container mx-auto px-6 py-3 gap-9">
+          <div className="flex justify-between items-center ">
+            <div className="text-xl  text-gray-800 font-poppins"><Link href={"/"}>Ready Outfits</Link></div>
+           
+          <Link href={"/savedOutfits"}>Saved</Link>
+          </div>
+        </nav>
+      </header>
 
       {isLoading ? (
         <div className="mt-8 flex justify-center items-center h-96">
@@ -153,11 +197,17 @@ const Outfit = () => {
                   draggable="false"
                 />
                 <button
-                  className="absolute top-2 right-2 p-2 bg-white bg-opacity-75 rounded-full"
+                  className="absolute top-2 right-2 p-2 bg-white bg-opacity-75 rounded-full mb-11"
                   onClick={(e) => handleShare(e, fetchedItems[currentIndex])}
                 >
-                  <Share2 className="h-6 w-6 text-gray-800" />
+                  <Share2 className="h-6 w-6 text-gray-800 " />
                 </button>
+                <button
+                    className="absolute top-10 right-2 p-2 bg-white bg-opacity-75 rounded-full mt-3"
+                    onClick={() => saveOutfit(fetchedItems[currentIndex])}
+                  >
+                    <Save className="h-6 w-6 text-gray-800" />
+                  </button>
                 <motion.div
                   className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2"
                   initial={{ y: 50, opacity: 0 }}
